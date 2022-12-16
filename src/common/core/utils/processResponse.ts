@@ -3,8 +3,6 @@ import {Either} from '../Either';
 import {AppError} from '../errors/AppError';
 import {Result} from '../Result';
 import {RmqContext} from "@nestjs/microservices";
-import {RabbitMqService} from "../../../rabit-mq/Infra/services/rabbit-mq.service";
-import {retry} from "rxjs";
 
 
 export type ErrorsTypes<T> =
@@ -45,14 +43,22 @@ export class ProcessResponse {
 
     public static setResponseRMQ<T>(data: Either<ErrorsTypes<T>, Result<T>>, funcMapper: (domain: T) => any, context?: RmqContext, sendAck: boolean = false) {
 
+        function ack() {
+            const message = context.getMessage()
+            const channel = context.getChannelRef()
+            channel.ack(message)
+        }
+
         if (!data.isLeft()) {
             const value = data.value.unwrap();
+            ack()
             return {status: '200', value: funcMapper(value)};
         }
 
         const error = data.value.unwrapError();
 
         if (error.name === AppError.UnexpectedError.name) {
+            ack()
             return {
                 code: 400,
                 message: error.message,
@@ -60,12 +66,14 @@ export class ProcessResponse {
         }
 
         if (error.name === AppError.ValidationError.name) {
+            ack()
             return {
                 code: 401,
                 message: error.message,
             };
         }
 
+        ack()
         return {
             code: 400,
             message: 'bad request'

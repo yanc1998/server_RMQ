@@ -1,19 +1,32 @@
-import {Injectable} from "@nestjs/common";
-import {RabbitMqService} from "../../../rabit-mq/Infra/services/rabbit-mq.service";
-import {Either, right} from "../../../common/core/Either";
+import {Injectable, Logger} from "@nestjs/common";
+import {Either, left, right} from "../../../common/core/Either";
 import {AppError} from "../../../common/core/errors/AppError";
 import {Result} from "../../../common/core/Result";
+import {MailerService} from "@nestjs-modules/mailer";
+import {SendEmailDto} from "../DTO/send-email.dto";
 
 export type SendEmailUseCaseResponse = Either<AppError.UnexpectedErrorResult<string>,
     Result<string>>;
 
 @Injectable()
 export class SendEmailUseCase {
-    constructor(private readonly rabbitMqService: RabbitMqService) {
+    private _logger: Logger;
+
+    constructor(private readonly mailerService: MailerService) {
+        this._logger = new Logger('SendEmailUseCase');
     }
 
-    execute(data: any): SendEmailUseCaseResponse {
-        return right(Result.Ok("OK"))
+    async execute(data: SendEmailDto): Promise<SendEmailUseCaseResponse> {
+        try {
+            await this.mailerService.sendMail({
+                to: data.to,
+                template: data.template,
+                context: data.data,
+                //attachments: data.attachments as any
+            })
+            return right(Result.Ok("OK"))
+        } catch (error) {
+            return left(Result.Fail(new AppError.UnexpectedError(error)))
+        }
     }
-
 }

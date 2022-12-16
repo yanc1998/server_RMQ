@@ -1,8 +1,9 @@
-import {RabbitMqService} from "../../rabit-mq/Infra/services/rabbit-mq.service";
 import {Ctx, MessagePattern, Payload, RmqContext} from "@nestjs/microservices";
 import {Controller} from "@nestjs/common";
 import {SendEmailUseCase} from "../Application/UseCases/send-email.useCase";
 import {ProcessResponse} from "../../common/core/utils/processResponse";
+import {SendEmailDto} from "../Application/DTO/send-email.dto";
+import {RequestEmailDto} from "../Application/DTO/request-email.dto";
 
 @Controller()
 export class EmailController {
@@ -11,9 +12,9 @@ export class EmailController {
     }
 
     @MessagePattern('send-email')
-    send(@Payload() data: Record<string, any>, @Ctx() context?: RmqContext) {
-        const IsOK = this.sendEmailUseCase.execute(data)
-        return ProcessResponse.setResponseRMQ(IsOK, (a) => (a), context)
+    async send(@Payload() data: RequestEmailDto, @Ctx() context?: RmqContext) {
+        const result = await this.sendEmailUseCase.execute(data.data)
+        return ProcessResponse.setResponseRMQ(result, (a) => (a), context)
     }
 
 }

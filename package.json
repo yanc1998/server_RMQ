@@ -21,12 +21,19 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@hapi/joi": "^17.1.1",
+    "@nestjs-modules/mailer": "^1.8.1",
     "@nestjs/common": "^8.0.0",
+    "@nestjs/config": "^2.2.0",
     "@nestjs/core": "^8.0.0",
     "@nestjs/microservices": "^9.2.1",
     "@nestjs/platform-express": "^8.0.0",
     "amqp-connection-manager": "^4.1.9",
     "amqplib": "^0.10.3",
+    "class-validator": "^0.14.0",
+    "ejs": "^3.1.8",
+    "handlebars": "^4.7.7",
+    "pug": "^3.0.2",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0"
