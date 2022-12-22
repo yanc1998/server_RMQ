@@ -2,7 +2,6 @@ import {Ctx, MessagePattern, Payload, RmqContext} from "@nestjs/microservices";
 import {Controller} from "@nestjs/common";
 import {SendEmailUseCase} from "../Application/UseCases/send-email.useCase";
 import {ProcessResponse} from "../../common/core/utils/processResponse";
-import {SendEmailDto} from "../Application/DTO/send-email.dto";
 import {RequestEmailDto} from "../Application/DTO/request-email.dto";
 
 @Controller()
